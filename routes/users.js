@@ -49,8 +49,11 @@ router.get('/users', (req, res) => {
 
 router.get('/users/:userID', (req, res) => {
     
+    let c = req.params.userid
+        
     const resultUser = userData.users.find(d => 
     {
+        
         if (d.userid == req.params.userID)
         {
             return true;
@@ -67,6 +70,7 @@ router.get('/users/:userID', (req, res) => {
     }
     else
     {
+        //res.sendStatus(200);
         res.json(resultUser);
     }
     //console.log("Path working");
@@ -87,6 +91,26 @@ function validateUser(req, res, next) {
         err.message = "Missing your last name";
         next(err);
     }
+    if(has(req.body, 'address') == false)
+    {
+        err.message = "Missing your address";
+        next(err);
+    }
+    if(has(req.body, 'phoneNumber') == false)
+    {
+        err.message = "Missing your phone number";
+        next(err);
+    }
+    if(has(req.body, 'email') == false)
+    {
+        err.message = "Missing your email";
+        next(err);
+    }
+    if(has(req.body, 'password') == false)
+    {
+        err.message = "Missing your password";
+        next(err);
+    }
     next();
 }
 
@@ -101,7 +125,7 @@ router.post('/users', [validateJSONHeaders, validateUser], (req, res) =>{
         password: req.body.password
     }
     userData.users.push(newUser);
-    console.log("New user created");
+    console.log("New user created with id " + newUser.userid);
     res.status(201);
     res.json(newUser);
     
