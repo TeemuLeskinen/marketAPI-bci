@@ -9,7 +9,7 @@ let postingsData = {
             id: 1,
             title: "iPhone 12",
             description: "6.1 display, 128Gt, 5G, iOS14",
-            category: "Phones",
+            category: "phones",
             location: "Oulu",
             //image:
             price: 929,
@@ -24,11 +24,27 @@ let postingsData = {
         {
             id: 2,
             title: "OnePlus 8",
-            description: "6.1 display, 128Gt, 5G, Android 12",
-            category: "Phones",
+            description: "6.55 display, 128Gt, 5G, Android 10",
+            category: "phones",
             location: "Oulu",
             //image:
             price: 799,
+            datePosted: "2021-2-14",
+            deliveryType: "Delivery",
+            sellerName: "John Doe",
+            userId: 2,
+            email: "john@email",
+            phoneNumber: 2233565
+
+        },
+        {
+            id: 3,
+            title: "Macbook Air M1",
+            description: "13.3 display, 512Gt SSD, 8Gt RAM, macOS Catalina",
+            category: "computers",
+            location: "Helsinki",
+            //image:
+            price: 1429,
             datePosted: "2021-2-14",
             deliveryType: "Delivery",
             sellerName: "John Doe",
@@ -60,45 +76,51 @@ postingsRouter.get('/postings', (req, res) => {
     console.log("Postings sent");
 })
 
-//search?parameter=category&searchValue=phones
-postingsRouter.get('/postings/search',(req, res) => {
+/* Route for the searches. Search can be made by category, location or date.
+Example HTTP request /postings/search?parameter=category&searchValue=phones */
+postingsRouter.get('/postings/search', (req, res, next) => {
     
     console.log("Route working");    
-    
     const param = req.query.parameter;
-    const result = req.query.searchValue;
-    const p = "hello";
-    if (param === "category" && result === "phones")
+    const value = req.query.searchValue;
+    const err = new Error();
+    err.name = "Not found";
+    err.status = 404;
+    err.message = "Given parameter not found"
+
+    if (param === 'category')
     {
-
-        console.log("I'm here " + param ," " + result);
+        let results = postingsData.postings.filter(r => r.category === value);
+        console.log(results);   
+        res.json(results);
+        res.status(200);
+        next();
     }
+    if (param === 'location')
+    {
+        let results = postingsData.postings.filter(r => r.location === value);
+        console.log(results);   
+        res.json(results);
+        res.status(200);
+        next();
+    }
+    if (param === 'date')
+    {
+        let results = postingsData.postings.filter(r => r.datePosted === value);
+        console.log(results);   
+        res.json(results);
+        res.status(200);
+        next();
+    }
+
     else
-        console.log("Wrong parameter");
-
-    //res.json(param + result);    
-    //console.log(param);
-    //res.json(category);
-    //console.log(category);
-                
-    /*const resultCategory = postingsData.postings.find(d => {
-        if (d.category == req.query.searchValue)
-        {
-            return true
-        }
-        else
-        {
-            return false
-        }
-        });
-        res.json(resultCategory);
-
-
-        
-        console.log(resultCategory);*/
+    {
+        next(err);
+    }   
+    
 })
 
-
+/* Route to make a new posting*/
 postingsRouter.post('/postings',(req, res) =>{
     const newPosting = {
         id: postingsData.postings.length + 1,
@@ -120,12 +142,17 @@ postingsRouter.post('/postings',(req, res) =>{
     console.log(newPosting);
 })
 
+
 postingsRouter.put('/postings/:id',(req, res) =>{
-    const data = postingsData.postings.filter(postings => postings.id != req.params.id);
-    console.log(data);
+
+    
+    const data = postingsData.postings.find(d => d.id === req.params.id);
+    const mod = req.body
+    console.log(mod);
     res.sendStatus(200);
 })
 
+/* Route to delete a posting */
 postingsRouter.delete('/postings/:id', (req, res) => {
     postingsData.postings = postingsData.postings.filter(postings => postings.id != req.params.id);
     
