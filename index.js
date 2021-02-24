@@ -12,6 +12,8 @@ app.use(bodyParser.json());
 app.use(usersRouter);
 app.use(postingsRouter);
 
+
+
 app.listen(port, () => {
     console.log(`API listening on port ${port}`);
 });

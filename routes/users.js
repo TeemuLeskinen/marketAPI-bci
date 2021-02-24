@@ -5,7 +5,6 @@ const bcrypt = require('bcrypt');
 
 //const fs = require('fs');
 
-
 function validateJSONHeaders(req, res, next)
 {
     if(req.get('Content-Type') === 'application/json')
@@ -46,11 +45,7 @@ let userData ={
     
 };
 
-
-//let hashed = bcrypt.hashSync("testPassword", 6);
-//console.log("Password: " + hashed);
 /* HTTP Basic Authentication using passport module */
-
 const passport = require('passport');
 const BasicStrategy = require('passport-http').BasicStrategy;
 
@@ -159,5 +154,6 @@ router.post('/users', [validateJSONHeaders, validateUser], (req, res) =>{
     res.json(newUser);
     
 });
+
 
 module.exports = router;

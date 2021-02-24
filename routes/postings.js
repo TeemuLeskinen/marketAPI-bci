@@ -137,7 +137,7 @@ postingsRouter.post('/postings',(req, res) =>{
     }
     postingsData.postings.push(newPosting);
 
-    res.status(201);
+    res.status(201, {message: "New user created"});
     res.json(newPosting);
     console.log(newPosting);
 })
