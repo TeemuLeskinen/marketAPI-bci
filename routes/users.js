@@ -1,6 +1,7 @@
 const express = require('express');
 const has = require('has-value');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
 
 //const fs = require('fs');
 
@@ -47,10 +48,8 @@ router.get('/users', (req, res) => {
     console.log("User info sent")
 });
 
-router.get('/users/:userID', (req, res) => {
-    
-    let c = req.params.userid
-        
+router.get('/users/:userID', (req, res) => {    
+           
     const resultUser = userData.users.find(d => 
     {
         
@@ -62,8 +61,7 @@ router.get('/users/:userID', (req, res) => {
         {
             return false;
         }
-    });
-    console.log(resultUser);    
+    });        
     if (resultUser == undefined)
     {
         res.sendStatus(404);
@@ -114,7 +112,9 @@ function validateUser(req, res, next) {
     next();
 }
 
+/* Route for registering new users */
 router.post('/users', [validateJSONHeaders, validateUser], (req, res) =>{
+    const hashedPassword = bcrypt.hashSync(req.body.password, 6);
     const newUser = {        
         userid: userData.users.length +1,
         firstName: req.body.firstName,
@@ -122,7 +122,7 @@ router.post('/users', [validateJSONHeaders, validateUser], (req, res) =>{
         address: req.body.address,
         phoneNumber: req.body.phoneNumber,
         email: req.body.email,
-        password: req.body.password
+        password: hashedPassword
     }
     userData.users.push(newUser);
     console.log("New user created with id " + newUser.userid);
