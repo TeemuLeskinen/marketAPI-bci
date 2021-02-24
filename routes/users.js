@@ -2,6 +2,8 @@ const express = require('express');
 const has = require('has-value');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const Ajv = require('ajv').default;
+const userJSON = require('../schemas/userSchema.json');
 
 //const fs = require('fs');
 
@@ -137,7 +139,39 @@ function validateUser(req, res, next) {
 }
 
 /* Route for registering new users */
-router.post('/users', [validateJSONHeaders, validateUser], (req, res) =>{
+/*router.post('/users', [validateJSONHeaders, validateUser], (req, res) =>{
+    const hashedPassword = bcrypt.hashSync(req.body.password, 6);
+    const newUser = {        
+        userid: userData.users.length +1,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        address: req.body.address,
+        phoneNumber: req.body.phoneNumber,
+        email: req.body.email,
+        password: hashedPassword
+    }
+    userData.users.push(newUser);
+    console.log("New user created with id " + newUser.userid);
+    res.status(201);
+    res.json(newUser);
+    
+});*/
+
+/* Middleware to validate JSON schema */
+function validateJSONSchema(req, res, next) {
+    const ajv = new Ajv();
+    const validate = ajv.compile(userJSON);
+    const valid = validate(req.body);
+    if (!valid) {
+        console.log(validate.errors);
+        res.status(400)
+        res.json(validate.errors);
+    }
+    res.send("OK");
+}
+
+router.post('/users', [validateJSONHeaders, validateJSONSchema], (req, res) =>{
+    
     const hashedPassword = bcrypt.hashSync(req.body.password, 6);
     const newUser = {        
         userid: userData.users.length +1,
