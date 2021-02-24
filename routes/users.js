@@ -1,7 +1,7 @@
 const express = require('express');
 const has = require('has-value');
 const router = express.Router();
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 
 //const fs = require('fs');
 
@@ -22,33 +22,62 @@ function validateJSONHeaders(req, res, next)
 
 let userData ={
     users:[    
+    
     {
         userid: 1,
         firstName: "John",
         lastName: "Doe",
         address: "Street 1",
-        phoneNumber: 2233565,
+        phoneNumber: 352654,
         email: "john@email",
-        password: "1234"
-    },
+        password: "$2b$06$gUrQ8f/DBADGdnOfjXt.p.8VHZdozlJ6Ewj8l7OE/7FcOEtIfEriK"//testerPassword
+    
+    },    
     {
         userid: 2,
         firstName: "Jane",
         lastName: "Doe",
         address: "Street 1",
-        phoneNumber: 65265,
+        phoneNumber: 352654,
         email: "jane@email",
-        password: "3654"
-    }]
+        password: "$2b$06$j/YUYr2fkkFRn86YlzBVYePRzDD0lLQ0APZL55AZt/KTn.z2TR8Pa" //1234
+    }
+    ]
     
 };
+
+
+//let hashed = bcrypt.hashSync("testPassword", 6);
+//console.log("Password: " + hashed);
+/* HTTP Basic Authentication using passport module */
+
+const passport = require('passport');
+const BasicStrategy = require('passport-http').BasicStrategy;
+
+passport.use(new BasicStrategy(
+    function(username, password, done) {        
+        
+        const user = userData.users.find(u => u.email === username);               
+        if (user == undefined) {
+            console.log("HTTP Basic username not found");
+            return done (null, false, { message: "HTTP Basic username not found"});
+        }    
+        if(bcrypt.compareSync(password, user.password) == false) {
+            console.log("HTTP Basic password not matching username");
+            return done (null, false, { message: "HTTP Basic password not found"});
+        }
+        return done(null, user);
+    }
+));
 
 router.get('/users', (req, res) => {    
     res.json(userData.users);
     console.log("User info sent")
 });
 
-router.get('/users/:userID', (req, res) => {    
+router.get('/users/:userID',
+            passport.authenticate('basic', { session: false}),
+             (req, res) => {    
            
     const resultUser = userData.users.find(d => 
     {
