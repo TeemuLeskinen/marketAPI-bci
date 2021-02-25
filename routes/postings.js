@@ -1,4 +1,4 @@
-const express = require('express');
+/*const express = require('express');
 const has = require('has-value');
 const postingsRouter = express.Router();
 
@@ -72,11 +72,11 @@ postingsRouter.get('/postings', (req, res) => {
     //res.json(postingsData.postings);
     res.json(postingsData);
     console.log("Postings sent");
-})
+})*/
 
 /* Route for the searches. Search can be made by category, location or date.
 Example HTTP request /postings/search?parameter=category&searchValue=phones */
-postingsRouter.get('/postings/search', (req, res, next) => {
+/*postingsRouter.get('/postings/search', (req, res, next) => {
     
     const param = req.query.parameter;
     const value = req.query.searchValue;
@@ -115,10 +115,10 @@ postingsRouter.get('/postings/search', (req, res, next) => {
         next(err);
     }   
     
-})
+})*/
 
 /* Route to make a new posting*/
-postingsRouter.post('/postings',(req, res) =>{
+/*postingsRouter.post('/postings',(req, res) =>{
     const newPosting = {
         id: postingsData.postings.length + 1,
         title: req.body.title,
@@ -147,14 +147,14 @@ postingsRouter.put('/postings/:id',(req, res) =>{
     const mod = req.body
     console.log(mod);
     res.sendStatus(200);
-})
+})*/
 
 /* Route to delete a posting */
-postingsRouter.delete('/postings/:id', (req, res) => {
+/*postingsRouter.delete('/postings/:id', (req, res) => {
     postingsData.postings = postingsData.postings.filter(postings => postings.id != req.params.id);
     
     res.sendStatus(200);
 })
 
 
-module.exports = postingsRouter;
+module.exports = postingsRouter;*/

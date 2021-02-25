@@ -4,23 +4,58 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const Ajv = require('ajv').default;
 const userJSON = require('../schemas/userSchema.json');
+const postingJSON = require('../schemas/postingSchema.json');
 const postings = require('./postings')
-
 //const fs = require('fs');
 
+let postingsData = {
+    postings: [
+        {
+            id: 1,
+            title: "iPhone 12",
+            description: "6.1 display, 128Gt, 5G, iOS14",
+            category: "phones",
+            location: "Oulu",
+            //image:
+            price: 929,
+            datePosted: "2021-2-14",
+            deliveryType: "Delivery",
+            sellerName: "John Doe",            
+            email: "john@email",
+            phoneNumber: 2233565
 
-function validateJSONHeaders(req, res, next)
-{
-    if(req.get('Content-Type') === 'application/json')
-    {
-        next();
-    }
-    else
-    {
-        const err = new Error('Bad Request - Missing Headers');
-        err.status = 400;
-        next(err);
-    }
+        },
+        {
+            id: 2,
+            title: "OnePlus 8",
+            description: "6.55 display, 128Gt, 5G, Android 10",
+            category: "phones",
+            location: "Oulu",
+            //image:
+            price: 799,
+            datePosted: "2021-2-14",
+            deliveryType: "Delivery",
+            sellerName: "John Doe",            
+            email: "john@email",
+            phoneNumber: 2233565
+
+        },
+        {
+            id: 3,
+            title: "Macbook Air M1",
+            description: "13.3 display, 512Gt SSD, 8Gt RAM, macOS Catalina",
+            category: "computers",
+            location: "Helsinki",
+            //image:
+            price: 1429,
+            datePosted: "2021-2-14",
+            deliveryType: "Delivery",
+            sellerName: "John Doe",            
+            email: "john@email",
+            phoneNumber: 2233565
+
+        }
+    ]
 }
 
 let userData ={
@@ -69,17 +104,21 @@ passport.use(new BasicStrategy(
     }
 ));
 
-/**
- * 
- * Here are the routes for the users path 
- * 
-*/
+/****************************************
+ * Here are the routes for the users path
+*****************************************/
 
 /* Get list of all users */
-router.get('/users', (req, res) => {    
-    //res.json(userData.users);
-    res.json(userData);
-    console.log("User info sent")
+router.get('/users', (req, res) => {
+    if (userData == null) {
+        res.status(404);
+        console.log("Users not found");
+    }
+    else {
+        res.json(userData);
+        res.status(200);
+        console.log("User info sent");
+    }           
 });
 
 /* Get user identified by userID */
@@ -105,7 +144,7 @@ router.get('/users/:userID',
     }
     else
     {
-        //res.sendStatus(200);
+        res.status(200);
         res.json(resultUser);
     }    
 })
@@ -145,5 +184,130 @@ router.post('/users', validateJSONSchema, (req, res) =>{
     
 });
 
+/*************************  
+ * Routes to postings path
+**************************/
+
+//?startIndex=100&count=500
+router.get('/postings', (req, res) => { 
+    if (postingsData == null) {
+        res.status(404);
+        console.log("Postings not found");
+        return;
+    }
+    else {
+        res.json(postingsData);
+        res.status(200);
+        console.log("Postings sent sent");
+    }   
+    
+})
+
+/* Route for the searches. Search can be made by category, location or date.
+Example HTTP request /postings/search?parameter=category&searchValue=phones */
+router.get('/postings/search', (req, res) => {
+    
+    const param = req.query.parameter;
+    console.log(param);
+    const value = req.query.searchValue;
+    const err = new Error();
+    err.name = "Not found";
+    err.status = 404;
+    err.message = "Given parameter not found"
+
+    if (param === 'category')
+    {
+        let results = postingsData.postings.filter(r => r.category === value);
+        console.log(results);   
+        res.json(results);
+        res.status(200);        
+        return;
+    }
+    if (param === 'location')
+    {
+        let results = postingsData.postings.filter(r => r.location === value);
+        console.log(results);   
+        res.json(results);
+        res.status(200);        
+        return;
+    }
+    if (param === 'date')
+    {
+        let results = postingsData.postings.filter(r => r.datePosted === value);
+        console.log(results);   
+        res.json(results);
+        res.status(200);        
+        return;
+    }
+    else
+    {
+        res.status(404);
+        res.send(err); 
+        console.log("Parameter not found");    
+    }   
+    
+})
+
+/* Middleware to validate new postings JSON schema using ajv */
+function validatePostingsJSONSchema(req, res, next) {
+    const ajv = new Ajv();
+    const validate = ajv.compile(postingJSON);
+    const valid = validate(req.body);
+    if (!valid) {
+        console.log(validate.errors);
+        res.status(400)
+        res.json(validate.errors);
+        return;
+    }
+    res.status("OK");
+    next();
+}
+
+//passport.authenticate('basic', { session: false}),
+/* Route to make a new posting*/
+router.post('/postings', validatePostingsJSONSchema, (req, res) =>{
+    const newPosting = {
+        id: postingsData.postings.length + 1,        
+        title: req.body.title,
+        description: req.body.description,
+        category: req.body.category,
+        location: req.body.location,
+        price: req.body.price,
+        datePosted: req.body.datePosted,
+        deliveryType: req.body.deliveryType,
+        sellerName: req.body.sellerName,
+        email: req.body.email,
+        phoneNumber: req.body.phoneNumber
+    }
+    postingsData.postings.push(newPosting);
+
+    res.status(201, {message: "New posting created"});
+    res.json(newPosting);
+    console.log(newPosting);
+})
+
+/* Route to edit title of the posting */
+router.put('/postings/:id',passport.authenticate('basic', { session: false}), (req, res) =>{       
+    const data = req.params.id;
+    const postingId = postingsData.postings.find(p => p.id == req.params.id);
+    const newTitle = req.body.title;
+    if(postingId == undefined)
+    {
+        res.sendStatus(400);        
+        return;
+    } 
+    else
+    {
+        postingId.title = newTitle;      
+        console.log(postingId);    
+        res.sendStatus(200);
+    }
+})
+
+/* Route to delete a posting */
+router.delete('/postings/:id', passport.authenticate('basic', { session: false}), (req, res)  => {
+    postingsData.postings = postingsData.postings.filter(postings => postings.id != req.params.id);    
+    res.sendStatus(200);
+})
 
 module.exports = router;

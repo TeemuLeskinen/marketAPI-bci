@@ -53,7 +53,8 @@ describe('Tests for postings', function() {
             await chai.request(apiAddress)
                 .get('/postings')
                 .then(response => {
-                    const id = response.body.postings.length - 1;                                
+                    const id = response.body.postings.length -1;
+                    console.log(id);                                
                     expect(response).to.have.status(200);
                     expect(response.body).to.be.jsonSchema(getPostingsSchema);
                     expect(response.body.postings[id].title).to.equal(testTitle);                    
