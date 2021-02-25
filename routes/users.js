@@ -4,8 +4,10 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const Ajv = require('ajv').default;
 const userJSON = require('../schemas/userSchema.json');
+const postings = require('./postings')
 
 //const fs = require('fs');
+
 
 function validateJSONHeaders(req, res, next)
 {
@@ -67,18 +69,26 @@ passport.use(new BasicStrategy(
     }
 ));
 
+/**
+ * 
+ * Here are the routes for the users path 
+ * 
+*/
+
+/* Get list of all users */
 router.get('/users', (req, res) => {    
-    res.json(userData.users);
+    //res.json(userData.users);
+    res.json(userData);
     console.log("User info sent")
 });
 
+/* Get user identified by userID */
 router.get('/users/:userID',
             passport.authenticate('basic', { session: false}),
              (req, res) => {    
            
     const resultUser = userData.users.find(d => 
-    {
-        
+    {        
         if (d.userid == req.params.userID)
         {
             return true;
@@ -91,73 +101,16 @@ router.get('/users/:userID',
     if (resultUser == undefined)
     {
         res.sendStatus(404);
+        return;
     }
     else
     {
         //res.sendStatus(200);
         res.json(resultUser);
-    }
-    //console.log("Path working");
+    }    
 })
 
-/* Middleware to handle new user validation */
-function validateUser(req, res, next) {
-    const err = new Error();
-    err.name = "Bad Request";
-    err.status = 400;
-    if(has(req.body, 'firstName') == false)
-    {
-        err.message = "Missing your first name";
-        next(err);
-    }
-    if(has(req.body, 'lastName') == false)
-    {
-        err.message = "Missing your last name";
-        next(err);
-    }
-    if(has(req.body, 'address') == false)
-    {
-        err.message = "Missing your address";
-        next(err);
-    }
-    if(has(req.body, 'phoneNumber') == false)
-    {
-        err.message = "Missing your phone number";
-        next(err);
-    }
-    if(has(req.body, 'email') == false)
-    {
-        err.message = "Missing your email";
-        next(err);
-    }
-    if(has(req.body, 'password') == false)
-    {
-        err.message = "Missing your password";
-        next(err);
-    }
-    next();
-}
-
-/* Route for registering new users */
-/*router.post('/users', [validateJSONHeaders, validateUser], (req, res) =>{
-    const hashedPassword = bcrypt.hashSync(req.body.password, 6);
-    const newUser = {        
-        userid: userData.users.length +1,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        address: req.body.address,
-        phoneNumber: req.body.phoneNumber,
-        email: req.body.email,
-        password: hashedPassword
-    }
-    userData.users.push(newUser);
-    console.log("New user created with id " + newUser.userid);
-    res.status(201);
-    res.json(newUser);
-    
-});*/
-
-/* Middleware to validate JSON schema */
+/* Middleware to validate new user JSON schema using ajv */
 function validateJSONSchema(req, res, next) {
     const ajv = new Ajv();
     const validate = ajv.compile(userJSON);
@@ -166,11 +119,14 @@ function validateJSONSchema(req, res, next) {
         console.log(validate.errors);
         res.status(400)
         res.json(validate.errors);
+        return;
     }
-    res.send("OK");
+    res.status("OK");
+    next();
 }
 
-router.post('/users', [validateJSONHeaders, validateJSONSchema], (req, res) =>{
+/* Route to create a new user*/
+router.post('/users', validateJSONSchema, (req, res) =>{
     
     const hashedPassword = bcrypt.hashSync(req.body.password, 6);
     const newUser = {        

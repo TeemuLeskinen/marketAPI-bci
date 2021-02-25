@@ -15,8 +15,7 @@ let postingsData = {
             price: 929,
             datePosted: "2021-2-14",
             deliveryType: "Delivery",
-            sellerName: "John Doe",
-            userId: 1,
+            sellerName: "John Doe",            
             email: "john@email",
             phoneNumber: 2233565
 
@@ -31,8 +30,7 @@ let postingsData = {
             price: 799,
             datePosted: "2021-2-14",
             deliveryType: "Delivery",
-            sellerName: "John Doe",
-            userId: 2,
+            sellerName: "John Doe",            
             email: "john@email",
             phoneNumber: 2233565
 
@@ -47,8 +45,7 @@ let postingsData = {
             price: 1429,
             datePosted: "2021-2-14",
             deliveryType: "Delivery",
-            sellerName: "John Doe",
-            userId: 2,
+            sellerName: "John Doe",            
             email: "john@email",
             phoneNumber: 2233565
 
@@ -72,7 +69,8 @@ function validateJSONHeaders(req, res, next)
 
 //?startIndex=100&count=500
 postingsRouter.get('/postings', (req, res) => {
-    res.json(postingsData.postings);
+    //res.json(postingsData.postings);
+    res.json(postingsData);
     console.log("Postings sent");
 })
 
@@ -80,7 +78,6 @@ postingsRouter.get('/postings', (req, res) => {
 Example HTTP request /postings/search?parameter=category&searchValue=phones */
 postingsRouter.get('/postings/search', (req, res, next) => {
     
-    console.log("Route working");    
     const param = req.query.parameter;
     const value = req.query.searchValue;
     const err = new Error();
@@ -137,7 +134,7 @@ postingsRouter.post('/postings',(req, res) =>{
     }
     postingsData.postings.push(newPosting);
 
-    res.status(201, {message: "New user created"});
+    res.status(201, {message: "New posting created"});
     res.json(newPosting);
     console.log(newPosting);
 })

@@ -1,8 +1,4 @@
-const server = require('./server');
-server.start();
-
-
-/*const express = require('express');
+const express = require('express');
 const app = express();
 const port = 3000;
 
@@ -16,8 +12,16 @@ app.use(bodyParser.json());
 app.use(usersRouter);
 app.use(postingsRouter);
 
+let serverInstance = null
 
+module.exports = {
+    start: () => {
+        serverInstance = app.listen(port, () => {
+            console.log(`API listening on port ${port}`)
+    })
+    },
+    close: () => {
+        serverInstance.close();
+    }
+}
 
-app.listen(port, () => {
-    console.log(`API listening on port ${port}`);
-});*/
