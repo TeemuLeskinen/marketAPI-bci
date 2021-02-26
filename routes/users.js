@@ -84,6 +84,11 @@ let userData ={
     
 };
 
+/*********************************************
+ This file consists all the routes for the api
+**********************************************/
+
+
 /* HTTP Basic Authentication using passport module */
 const passport = require('passport');
 const BasicStrategy = require('passport-http').BasicStrategy;
