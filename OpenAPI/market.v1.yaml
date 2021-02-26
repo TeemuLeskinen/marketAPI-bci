@@ -1,0 +1,204 @@
+openapi: 3.0.0
+info:
+  title: market
+  version: '1.0'
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /users:
+    get:
+      summary: Get all users
+      operationId: get-users
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not Found
+      description: Get information of all users
+      parameters: []
+    post:
+      summary: Create a new user
+      operationId: post-users
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+      description: Create new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/user'
+      security: []
+  '/users/{userid}':
+    parameters:
+      - schema:
+          type: string
+        name: userid
+        in: path
+        required: true
+    get:
+      summary: Get user by userid
+      operationId: get-users-userid
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: User not Found
+      description: Get information of one user
+      parameters: []
+  /postings:
+    get:
+      summary: Get all postings
+      operationId: get-postings
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not Found
+      description: Get all postings on site
+      security: []
+    parameters: []
+    post:
+      summary: Create posting
+      operationId: post-postings
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+      description: Make a new posting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/postings'
+  '/postings/{id}':
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+    delete:
+      summary: Delete posting
+      operationId: delete-postings
+      responses:
+        '200':
+          description: OK
+        '403':
+          description: Forbidden
+      description: User can delete posting they have made
+    put:
+      summary: Modify posting
+      operationId: put-postings
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+      description: User can modify title of the posting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+  /postings/search:
+    get:
+      summary: Search from postings
+      operationId: get-postings-search
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not Found
+      description: 'User can search postings by giving query parameters: parameter and searchValue. Parameter can be category, location or date.'
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: parameter
+          required: true
+        - schema:
+            type: string
+          in: query
+          name: searchValue
+          required: true
+      security: []
+components:
+  schemas:
+    user:
+      title: user
+      type: object
+      x-examples:
+        example-1:
+          userId: 0
+          firstName: string
+          lastName: string
+          address: string
+          phoneNumber: 0
+          email: string
+          password: string
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        address:
+          type: string
+        phoneNumber:
+          type: integer
+        email:
+          type: string
+        password:
+          type: string
+    postings:
+      title: postings
+      type: object
+      x-examples:
+        example-1:
+          title: string
+          description: string
+          category: string
+          location: string
+          price: 0
+          datePosted: string
+          deliveryType: string
+          sellerName: string
+          email: string
+          phoneNumber: 0
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        location:
+          type: string
+        price:
+          type: number
+        datePosted:
+          type: string
+        deliveryType:
+          type: string
+        sellerName:
+          type: string
+        email:
+          type: string
+        phoneNumber:
+          type: integer
+  securitySchemes:
+    HTTP basic auth:
+      type: http
+      scheme: basic
+security:
+  - API Key - 1: []
