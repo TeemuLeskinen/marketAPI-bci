@@ -217,10 +217,10 @@ router.get('/postings/search', (req, res) => {
 
     if (param === 'category')
     {
-        let results = postingsData.postings.filter(r => r.category === value);
+        let results = postingsData.postings.filter(r => r.category === value);            
         console.log(results);   
         res.json(results);
-        res.status(200);        
+        res.status(200);                  
         return;
     }
     if (param === 'location')
