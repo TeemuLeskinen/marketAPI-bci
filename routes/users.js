@@ -109,6 +109,10 @@ passport.use(new BasicStrategy(
     }
 ));
 
+router.get('/', (req, res) => {
+    res.sendFile(__dirname + '../html-document-generated/index.html');
+})
+
 /****************************************
  * Here are the routes for the users path
 *****************************************/

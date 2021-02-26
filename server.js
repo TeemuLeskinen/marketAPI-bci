@@ -8,6 +8,10 @@ const bodyParser = require('body-parser');
 
 app.set('port', (process.env.PORT || 80));
 
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/html-documentation-generated/index.html');
+})
+
 app.use(bodyParser.json());
 app.use(router);
 
