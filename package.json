@@ -13,6 +13,9 @@
     "passport-http": "^0.3.0",
     "routes": "^2.1.0"
   },
+  "engines": {
+    "node": "14.x"
+  },
   "devDependencies": {
     "mocha": "^8.3.0"
   },
